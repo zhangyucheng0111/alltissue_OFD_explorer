@@ -1,0 +1,68 @@
+{
+  "title": "Young AllTissue parameter explorer",
+  "generatedAt": "2026-10-23T04:31:42+00:00",
+  "sourceCount": 279,
+  "scopeCounts": {
+    "final": 19,
+    "ATPm_sweep_20261005_130907": 4,
+    "atpm_3_4_20261012": 3,
+    "atpm_3_6_warmOnly_20261012": 7,
+    "atpm_4_6_20261012": 5,
+    "biological_assessment_20261012": 3,
+    "e001_k01_minBAC_1.1": 1,
+    "e001_k01_minBAC_1.1_hardConstrain": 1,
+    "e001_k01_minBAC_1.1_warmStart": 1,
+    "e001_k01_minBAC_1.1_warmStart_hardConstrain": 1,
+    "epsilon_e0001_minBAC_coef11_comparison_20261003_134058": 2,
+    "epsilon_minBAC_coef11_comparison_20261003_123944": 4,
+    "epsilon_pfd_comparison_20261003_120357": 4,
+    "exploration_20261007_124013": 153,
+    "minBAC_1.1_W_H_WH_minExc_20261006_095053": 12,
+    "no_minBAC_W_H_WH_minExc_20261005_161719": 12,
+    "robustOFD_20261022": 4,
+    "robustOFD_20261022_bound": 3,
+    "robustOFD_20261022_lowScale": 6,
+    "robustOFD_20261022_region": 9,
+    "robustOFD_20261022_threads": 4,
+    "robustOFD_20261022_totalGap": 21
+  },
+  "epsilonProvenance": "Effective epsilon0 and k are mapped explicitly from the epsilon filename, overriding nominal TSV values for known files. epsilon_scale_2of5p5.mat uses original (0.01, 0.1) times 2/5.5; e095/e105 change only scaled epsilon0 by 0.95/1.05 and k095/k105 change only scaled k. Standard epsilon_e001_k01.mat means (0.01, 0.1), e0009 means epsilon0=0.009. Unknown filenames use finite explicit TSV epsilon0/k values or null; no epsilon MAT files are loaded and no model is run.",
+  "inputs": [
+    {
+      "path": "/data/yuchengzhang/research/1_aging_C_elegans/allTissue-MERGE-v2-261002-minBAC-minExc/1_iMAT++/output/Young/test/flexibility_atlas_20261022_1845/all_279_attempts.tsv",
+      "sha256": "781dea250dee8fe09f6765ccf1a7467342b3daf45117424c0c33b2c8cf17d850"
+    },
+    {
+      "path": "/data/yuchengzhang/research/1_aging_C_elegans/allTissue-MERGE-v2-261002-minBAC-minExc/1_iMAT++/output/Young/test/parameter_explorer_web_20261022/build_site.py",
+      "sha256": "1e9e4326d64fdf8bed2493032b570be8bae13077612af66481c263fc26f738fd"
+    },
+    {
+      "path": "/data/yuchengzhang/research/1_aging_C_elegans/allTissue-MERGE-v2-261002-minBAC-minExc/1_iMAT++/output/Young/test/parameter_explorer_web_20261022/README.md",
+      "sha256": "b2f540fb90e47889ed4c08ffb421fbfcd73469b67144a870226db083ad9d26fc"
+    },
+    {
+      "path": "/data/yuchengzhang/research/1_aging_C_elegans/allTissue-MERGE-v2-261002-minBAC-minExc/1_iMAT++/output/Young/test/parameter_explorer_web_20261022/template.html",
+      "sha256": "bd2e61ce482a09f965de79db03c6749588d9eb3f32aef4a38874e56c2e3ade8c"
+    },
+    {
+      "path": "/data/yuchengzhang/research/1_aging_C_elegans/allTissue-MERGE-v2-261002-minBAC-minExc/1_iMAT++/output/Young/test/parameter_explorer_web_20261022/styles.css",
+      "sha256": "29ab22258757224e6fea0e19ea89162f35f234a267647f8ae24ffcaba44d2f5c"
+    },
+    {
+      "path": "/data/yuchengzhang/research/1_aging_C_elegans/allTissue-MERGE-v2-261002-minBAC-minExc/1_iMAT++/output/Young/test/parameter_explorer_web_20261022/plot_core.js",
+      "sha256": "0dc4d35fb8041133e4411cd4cac9173ab121fa91e19f12c5847b78b9fdf167fa"
+    },
+    {
+      "path": "/data/yuchengzhang/research/1_aging_C_elegans/allTissue-MERGE-v2-261002-minBAC-minExc/1_iMAT++/output/Young/test/parameter_explorer_web_20261022/app.js",
+      "sha256": "88dd744e9e0d29ef5515be5e6b1bc20fc1f1dd33d8176236bb7507fb200871b8"
+    }
+  ],
+  "outputs": {
+    "data.json": {
+      "sha256": "412922397ec29a45035cee9d7691bb0d6443e0157a8018caf405c572c6b93d23"
+    },
+    "index.html": {
+      "sha256": "8b2f04b77e95bb7a13327bc832ed44645bf50bc03625d29305289faf16c12e3e"
+    }
+  }
+}

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>AllTissue · Parameter Explorer</title>
+  <style>__STYLE__
+  .plot-point.highlight > circle,.plot-point.highlight > rect{stroke:#527894;stroke-width:3}
+  .tooltip small{display:block;font-size:10px;color:#bdd0df}
+  .tooltip p{margin:8px 0 3px}
+  button:disabled{cursor:default;opacity:.45}
+  .controls{grid-template-columns:1fr 40px 1fr;gap:18px}
+  .axis-control .field-label{font-size:12px;color:#274f67}
+  .axis-control select{font-size:18px;padding:13px}
+  .fixed-control{grid-column:1/-1;border-left:0;border-top:1px solid #dbe5eb;padding:18px 0 0}
+  .fixed-control>.field-label{font-size:12px;color:#274f67}
+  .fixed-panel{position:static;width:100%;max-height:none;overflow:visible;border:0;border-radius:0;box-shadow:none;padding:0}
+  .fixed-fields{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+  .fixed-fields label{font-size:12px;font-weight:600;color:#39576b}
+  .fixed-fields select{font-size:13px;font-weight:600;background:#f6fafc}
+  #charts{display:grid;grid-template-columns:minmax(0,1fr);gap:24px}
+  .workflow-block{margin-bottom:30px}.workflow-heading{padding:12px 0}
+  .workflow-heading h2{font-size:18px;margin:0}.workflow-heading h2 span{font-size:12px;font-weight:400;margin-left:14px;color:#65778a}
+  .workflow-heading p{font-size:11px;color:#65778a;margin:5px 0;overflow-wrap:anywhere}
+  #axis-summary{font-size:20px;margin:0 0 10px;color:#214f6c}
+  .download-all{display:inline-block;background:#1e3449;color:white;border-radius:8px;padding:9px 13px;margin-top:10px;font-size:12px}
+  .chart-frame{display:grid;grid-template-columns:var(--y-axis-width,120px) minmax(0,1fr);grid-template-rows:minmax(0,1fr) 76px;margin:16px 18px 0;border:1px solid #dce5ec;border-radius:9px;overflow:hidden}
+  .chart-scroll{height:clamp(300px,58vh,640px);max-height:none;overflow:auto;min-width:0;min-height:0;overscroll-behavior:contain;background:white}
+  .fixed-y-axis{position:relative;background:#f6f9fb;border-right:1px solid #dce5ec;overflow:hidden;min-height:0}
+  .fixed-x-axis{background:#f6f9fb;border-top:1px solid #dce5ec;min-width:0;overflow:hidden}
+  .axis-corner{background:#f6f9fb;border-top:1px solid #dce5ec;border-right:1px solid #dce5ec;color:#6b7e8e;font-size:10px;display:grid;place-items:center}
+  .axis-layer{display:block;overflow:hidden}.plot-zoom{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 22px 0;font-size:12px;color:#536d80}
+  .plot-zoom input{width:145px;accent-color:#1c6a89}.plot-zoom output{font-variant-numeric:tabular-nums;min-width:38px;font-weight:650}
+  .plot-zoom button{padding:5px 9px}.zoom-help{font-size:10px;color:#7a8e9e}
+  .collection-card{width:365px}.collection-card strong{font-size:16px}
+  @media(max-width:900px){.fixed-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:720px){#charts{grid-template-columns:minmax(0,1fr)}.chart-frame{margin:12px 8px 0}.plot-zoom{margin-left:12px;gap:6px}.plot-zoom input{width:95px}.axis-control select{font-size:14px}.collection-card{width:100%}.fixed-fields select{font-size:11px}#axis-summary{font-size:16px}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div><div class="eyebrow"><span class="brand-dot"></span> ALLTISSUE / MODEL EXPLORATION</div><h1>Find the region.<br><span>Not just one solution.</span></h1><p class="intro">Choose two parameters. Hold the rest fixed.<br>Compare four outcomes from the actual model runs.</p></div>
+      <aside class="collection-card"><span class="field-label">ALL RECORDED RUNS</span><strong>One view. One mark per run.</strong><p id="scope-description"></p><span class="local-badge">● Failures stay visible · no averaging</span><br><a class="download-all" href="all_runs_parameters_results.xlsx" download>Download all runs · Excel ↗</a></aside>
+    </header>
+    <section class="controls" aria-label="Plot controls">
+      <label class="axis-control"><span class="field-label"><span class="axis-badge">1 · X</span> HORIZONTAL PARAMETER</span><select id="x-axis" aria-label="X parameter"></select></label>
+      <button id="swap" class="swap-button" aria-label="Swap X and Y axes" title="Swap axes">⇄</button>
+      <label class="axis-control"><span class="field-label"><span class="axis-badge">2 · Y</span> VERTICAL PARAMETER</span><select id="y-axis" aria-label="Y parameter"></select></label>
+      <div class="fixed-control"><span class="field-label">3 · FIXED CONDITIONS</span><button id="fixed-toggle" hidden><span id="fixed-summary"></span></button><div id="fixed-panel" class="fixed-panel"><div class="panel-heading"><p>Choose a fixed value or All values. Epsilon is one recorded ε₀–k pair. Threads, workflow, seed and historical versions never filter the view.</p><button id="fixed-close" hidden>Close</button></div><div id="fixed-fields" class="fixed-fields"></div><p class="small-note">A zero count means no recorded attempt at these conditions. All values allows that parameter to vary; its actual value is retained in the run details.</p></div></div>
+    </section>
+    <div class="toolbar"><div class="presets"><span>Quick views</span><button data-preset="atpm,bac">ATPm × BAC</button><button data-preset="bac,exchange">BAC × Exchange</button><button data-preset="atpm,epsilon">ATPm × Epsilon pair</button><button id="show-all">Show all 279 runs</button></div><div class="toolbar-right"><button id="reset">Reset</button><button id="copy-link">Copy view link</button><button id="export-svg">Export SVG</button><button id="export-png">Export PNG</button></div></div>
+    <section class="selection-strip" aria-live="polite"><h2 id="axis-summary"></h2><div id="selection-summary"></div><div id="pinned-chips" class="chips"></div></section>
+    <div class="view-options"><div class="shape-toggle" role="group" aria-label="Mark shape"><button id="shape-circle" data-shape="circle">● Circles</button><button id="shape-tile" data-shape="tile">▣ Tiles</button></div><label>Color scale <select id="color-scale"><option value="collection">Across all runs</option><option value="slice">Adaptive to this selection</option></select></label><span>One mark = one run · no averaging</span><label class="checkbox"><input id="untested" type="checkbox" checked> Show untested points</label></div>
+    <div id="empty-state" class="empty-state" hidden><h2>No runs at these fixed conditions</h2><p>This is a data gap, not a failed or infeasible model. Try a different fixed value or reset the view.</p></div>
+    <p class="small-note">One outcome per row. X / Y ticks stay outside the scrolling plot. Use − / +, the zoom slider, Fit width, or Fit all; Ctrl/⌘ + wheel also zooms. Panning stays synchronized across outcomes. Exports include the complete selection.</p>
+    <section id="charts" class="charts" aria-label="Four model outcomes"></section>
+    <div class="legend"><span><i class="legend-circle"></i> One mark per recorded run</span><span><b>—</b> Untested</span><span><b>FAIL</b> Failed</span><span><b>STOP</b> Externally stopped</span><span><b>NA</b> Missing result</span><span><b>!</b> Stage time limit</span><span><b>†</b> Numerical warning</span><span><i class="outline-key"></i> Joint acceptance not met</span></div>
+    <p id="view-note" class="view-note"></p>
+    <section id="inspector" class="inspector" hidden><div class="inspector-heading"><div><span class="field-label">SELECTED POINT</span><h2 id="inspector-title"></h2><p id="inspector-summary"></p></div><button id="inspector-close" class="icon-button" aria-label="Close selected point">×</button></div><div class="table-scroll" id="point-table"></div></section>
+    <details class="runs-section" id="runs-section"><summary><span id="runs-title">Matching runs</span><span class="small-note">Click a point to inspect its raw results</span></summary><button id="export-csv">Download matching runs CSV</button><div class="table-scroll" id="runs-table"></div></details>
+    <footer><div><strong>Observe, don’t interpolate.</strong><p>Untested combinations stay empty. Solver failures are not evidence of biological infeasibility.<br>Stable aggregate outputs do not establish physiological robustness.</p></div><div class="footer-meta"><span id="source-count"></span><a href="README.md">Methods &amp; refresh instructions ↗</a><a href="data.json">Download source dataset ↗</a></div></footer>
+  </main>
+  <div id="tooltip" class="tooltip" role="tooltip" hidden></div><div id="toast" class="toast" role="status" hidden></div>
+  <script id="experiment-data" type="application/json">__DATA__</script>
+  <script>__CORE__</script>
+  <script>__APP__</script>
+</body>
+</html>
