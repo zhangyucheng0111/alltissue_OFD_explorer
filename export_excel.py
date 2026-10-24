@@ -105,12 +105,12 @@ def main():
         runs = [run for run in payload['runs'] if run['scope'] == scope['id']]
         workflow_rows.append([scope['id'], len(runs), sum(run['meta']['state'] == 'completed' for run in runs), sum(run['meta']['state'] != 'completed' for run in runs), sum(run['meta']['timeLimit'] for run in runs), sum(run['meta']['warning'] for run in runs), scope['description']])
     notes = [
-        ['Coverage', '279 attempts, including completed, failed and interrupted runs; one row per original run ID.'],
+        ['Coverage', f'{len(summary)} attempts, including completed, failed and interrupted runs; one row per original run ID.'],
         ['Generated UTC', datetime.now(timezone.utc).isoformat()],
         ['Source TSV', str(source)],
         ['Source SHA256', hashlib.sha256(source.read_bytes()).hexdigest()],
         ['All runs', 'Readable normalized parameters and results. Filters enabled; first three columns and header frozen.'],
-        ['Parameters / Results', 'Alternative views of the same 279 runs, not additional attempts.'],
+        ['Parameters / Results', f'Alternative views of the same {len(summary)} runs, not additional attempts.'],
         ['Raw source', 'Every original TSV field, verbatim text. Empty cells remain empty. Includes stage timings, tissue fluxes and all available quality fields.'],
         ['Missing values', 'Blank means missing or not recorded, not zero. Disabled coefficients are blank, with their enabled flag false.'],
         ['Failed runs', 'Final four outcome metrics, final uptake and total ATPm are blank for workflows that did not return. Partial stage observations remain labeled by run status; raw source retains all evidence.'],
@@ -158,7 +158,8 @@ def main():
     doc_rel = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
     content = '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' + ''.join(f'<Override PartName="/xl/worksheets/sheet{index}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' for index in range(1, len(sheets) + 1)) + '</Types>'
     output = SITE / 'all_runs_parameters_results.xlsx'
-    with ZipFile(output, 'w', ZIP_DEFLATED) as archive:
+    temporary = output.with_suffix('.xlsx.tmp')
+    with ZipFile(temporary, 'w', ZIP_DEFLATED) as archive:
         archive.writestr('[Content_Types].xml', content)
         archive.writestr('_rels/.rels', f'<Relationships xmlns="{rel_ns}"><Relationship Id="rId1" Type="{doc_rel}/officeDocument" Target="xl/workbook.xml"/></Relationships>')
         archive.writestr('xl/workbook.xml', f'<workbook xmlns="{NS}" xmlns:r="{doc_rel}"><bookViews><workbookView/></bookViews><sheets>' + ''.join(f'<sheet name="{name}" sheetId="{index}" r:id="rId{index}"/>' for index, (name, *_rest) in enumerate(sheets, 1)) + '</sheets></workbook>')
@@ -166,6 +167,7 @@ def main():
         archive.writestr('xl/styles.xml', styles)
         for index, (name, columns, rows, conditions) in enumerate(sheets, 1):
             archive.writestr(f'xl/worksheets/sheet{index}.xml', sheet_xml(columns, rows, min(3, len(columns) - 1), conditions))
+    temporary.replace(output)
     print(f'Exported {len(summary)} attempts; {len(headers)} summary fields; {len(raw_headers)} raw fields; {len(sheets)} sheets: {output}')
 
 

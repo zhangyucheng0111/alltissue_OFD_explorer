@@ -8,15 +8,15 @@ let checks = 0;
 function verify(condition, message) { assert(condition, message); checks += 1; }
 const state = core.defaultState(data, 'auto');
 const view = core.collect(data, state);
-verify(data.runs.length === 279 && new Set(data.runs.map(run => run.id)).size === 279, '279 unique original runs');
-verify(view.selected.length === 279 && view.completed === 213, 'All runs, including failures, shown by default');
-verify(view.cells.reduce((count, cell) => count + cell.failed, 0) === 66, 'No failed or interrupted attempts hidden');
+verify(data.runs.length >= 279 && new Set(data.runs.map(run => run.id)).size === data.runs.length, 'Historical and supplemental runs have unique IDs');
+verify(view.selected.length === data.runs.length && view.completed === data.runs.filter(run => run.meta.state === 'completed').length, 'All runs, including failures, shown by default');
+verify(view.cells.reduce((count, cell) => count + cell.failed, 0) === data.runs.filter(run => run.meta.state !== 'completed').length, 'No failed or interrupted attempts hidden');
 verify(core.dimensions.length === 6 && !core.dimensions.some(dimension => ['threads', 'workflow', 'seed', 'policy', 'epsilon0', 'k'].includes(dimension.key)), 'Only six user-facing dimensions');
 verify(!view.groups, 'No historical/current workflow grouping');
 verify(view.cells.some(cell => new Set(cell.runs.map(run => run.protocol)).size > 1), 'Versions appear together at matching coordinates');
 const counts = new Map();
 for (const cell of view.cells) for (const run of cell.runs) counts.set(run.id, (counts.get(run.id) || 0) + 1);
-verify(counts.size === 279 && [...counts.values()].every(count => count === 1), 'Every original run appears exactly once per panel');
+verify(counts.size === data.runs.length && [...counts.values()].every(count => count === 1), 'Every original run appears exactly once per panel');
 const pairs = core.unique(data.runs.map(run => core.parameter(run, 'epsilon')));
 verify(pairs.length > 5 && pairs.every(pair => JSON.parse(pair).length === 2), 'Epsilon selector contains recorded pairs only');
 const scaled = JSON.stringify([0.01 * 2 / 5.5, 0.1 * 2 / 5.5]);
@@ -54,6 +54,6 @@ for (const xaxis of core.dimensions) for (const yaxis of core.dimensions) {
   }
 }
 const fullChart = core.chart(core.metrics[0], view, state).svg;
-verify((fullChart.match(/data-status="failed"/g) || []).length === 63, 'All 63 failures visible in the plot');
-verify((fullChart.match(/data-status="external_timeout"/g) || []).length === 3, 'All 3 external stops visible in the plot');
-console.log(`${checks} checks passed; 279 individual runs; 30 ordered axis combinations; no historical grouping.`);
+verify((fullChart.match(/data-status="failed"/g) || []).length === data.runs.filter(run => run.meta.state === 'failed').length, 'All failures visible in the plot');
+verify((fullChart.match(/data-status="external_timeout"/g) || []).length === data.runs.filter(run => run.meta.state === 'external_timeout').length, 'All external stops visible in the plot');
+console.log(`${checks} checks passed; ${data.runs.length} individual runs; 30 ordered axis combinations; no historical grouping.`);

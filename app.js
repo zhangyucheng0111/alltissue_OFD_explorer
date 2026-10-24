@@ -289,6 +289,10 @@
 
   function render() {
     view = core.collect(data, state);
+    element('show-all').textContent = `Show all ${data.runs.length} runs`;
+    const scan = data.meta.scanSummary;
+    element('scan-progress').hidden = !scan;
+    if (scan) element('scan-progress').textContent = `Supplemental epsilon / ATPm scan: ${scan.recorded} / ${scan.total} attempts recorded · ${scan.completed} completed · ${scan.failed + scan.external_timeout + scan.interrupted} failed / stopped · ${scan.running} running · ${scan.pending} pending. Only finished attempts enter the plots and Excel. Last local build: ${scan.updated_local}. Refresh or reopen after an update.`;
     element('scope-description').textContent = `${data.runs.length} total recorded runs. Current conditions match ${view.selected.length}. All matching attempts appear together, including failures. Threads, workflow, seed and historical version do not filter or split the plots.`;
     element('x-axis').value = state.x;
     element('y-axis').value = state.y;

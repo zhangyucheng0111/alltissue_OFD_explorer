@@ -62,7 +62,7 @@ for filename in [SITE / 'all_runs_parameters_results.xlsx', *map(Path, sys.argv[
     workbook = read_workbook(filename)
     assert len(workbook) == 6
     for name in ['All runs', 'Parameters', 'Results', 'Raw source']:
-        assert len(workbook[name]) == 280, (name, len(workbook[name]))
+        assert len(workbook[name]) == len(data['runs']) + 1, (name, len(workbook[name]))
     actual_ids = [row['A'] for row in workbook['All runs'][1:]]
     assert actual_ids == [run['id'] for run in data['runs']]
     for row_number, fields in enumerate(expected):
@@ -79,4 +79,4 @@ for filename in [SITE / 'all_runs_parameters_results.xlsx', *map(Path, sys.argv[
                 assert value is None, (run['id'], title)
             else:
                 assert abs(value - expected_value) < 1e-8 * max(1, abs(expected_value)), (run['id'], title)
-    print(f'PASS {filename}: 6 sheets, all 279 IDs, 190 raw fields verified cell by cell; numeric outcomes and failed-run blanks match.')
+    print(f'PASS {filename}: 6 sheets, all {len(data["runs"])} IDs, {len(expected[0])} raw fields verified cell by cell; numeric outcomes and failed-run blanks match.')

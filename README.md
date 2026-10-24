@@ -1,7 +1,7 @@
 # Offline Young AllTissue parameter explorer
 
-This isolated web artifact explores 279 recorded attempts from the sibling
-`flexibility_atlas_20261022_1845/all_279_attempts.tsv`. It reads recorded results
+This isolated web artifact starts from 279 historical attempts and appends
+finished supplemental epsilon / ATPm attempts from `all_attempts.tsv`. It reads recorded results
 only. Building or opening the page never runs MATLAB, Gurobi, or any model and
 does not change source experiments, production code, or the atlas.
 
@@ -25,9 +25,9 @@ or fetching of `data.json`. That JSON is also exported for inspection.
    Threads, solver seed, workflow type and historical version never filter or
    split the view. They remain in original records and Excel provenance.
 
-All 279 runs appear by default, including 63 failures and 3 external stops. There
+All recorded runs appear by default. The original 279 include 63 failures and 3 external stops. There
 is no historical/current workflow grouping. Choosing a fixed condition narrows
-the view; **Show all 279 runs** resets all non-axis conditions to All values.
+the view; **Show all runs** resets all non-axis conditions to All values.
 Epsilon options contain only pairs actually recorded, never an invented Cartesian
 product of epsilon0 and k. Either axis may also use the combined epsilon pair.
 Old version-1/2 saved views reset to the new all-runs default on first opening;
@@ -137,9 +137,9 @@ To refresh from an explicitly selected TSV with the same schema:
 python3 build_site.py --source /absolute/path/to/all_279_attempts.tsv
 ```
 
-Paths are resolved independently of the calling directory. Refresh requires 279
-unique run IDs and 19 final-scope runs; changed dataset sizes require an explicit
-revision of those guards. A successful refresh updates all three generated files
+Paths are resolved independently of the calling directory. Refresh requires at
+least the 279 historical attempts, unique run IDs, and 19 original final-scope
+runs. Supplemental attempts retain their own protocol. A successful refresh updates all three generated files
 and their timestamp and checksums. Reopen or reload the HTML afterward.
 
 For data-only validation before frontend files are ready, import
@@ -163,13 +163,20 @@ to open or use the website. No metabolic-model calculations are performed.
 
 ## Complete Excel workbook
 
+The supplemental scan appends only finished attempts and updates `scan_status.json`.
+The website embeds a progress summary; reopening/reloading displays the latest
+local build. It never connects to MATLAB and cannot run a model from a browser.
+The 72-case matrix uses four epsilon pairs (0.005/0.5, 0.005/0.1, 0.001/0.5,
+0.001/0.1), minBAC=1.1, warm+hard on, exchange off, and all 18 previously
+recorded ATPm/tissue values. GitHub Pages changes only after you publish updates.
+
 `all_runs_parameters_results.xlsx` contains every recorded attempt, not just the
 current plot selection. Its six sheets are:
 
-- **All runs:** 279 rows, 63 readable normalized parameter/result/quality fields.
+- **All runs:** all historical and finished supplemental rows, 63 readable normalized parameter/result/quality fields.
 - **Parameters:** the same runs with only parameter, version, and provenance fields.
 - **Results:** the same runs with outcomes, solver quality, and stage diagnostics.
-- **Raw source:** all 190 original TSV fields retained as text, including every
+- **Raw source:** all original TSV fields plus supplemental fields retained as text, including every
   available tissue flux and stage timing. Partial results are not discarded.
 - **Workflows:** coverage, returned/failure counts and warning counts by version.
 - **Notes:** units, timing boundaries, missing-value and quality interpretation.

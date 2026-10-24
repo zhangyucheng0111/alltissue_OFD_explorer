@@ -1,0 +1,52 @@
+{
+  "protocol": "epsilon_ATPm_OFD_scan_20261022",
+  "total": 72,
+  "pending": 0,
+  "running": 0,
+  "completed": 16,
+  "failed": 39,
+  "external_timeout": 17,
+  "interrupted": 0,
+  "recorded": 72,
+  "threads": 64,
+  "concurrent_fits": 1,
+  "ATPm_levels": [
+    1.4285714285714286,
+    1.8,
+    2.0,
+    2.2,
+    3.0,
+    3.5,
+    4.0,
+    4.5,
+    5.0,
+    5.25,
+    5.5,
+    5.625,
+    5.75,
+    6.0,
+    7.0,
+    8.0,
+    9.0,
+    10.0
+  ],
+  "epsilon_pairs": [
+    [
+      0.005,
+      0.5
+    ],
+    [
+      0.005,
+      0.1
+    ],
+    [
+      0.001,
+      0.5
+    ],
+    [
+      0.001,
+      0.1
+    ]
+  ],
+  "updated_local": "2026-10-23T21:05:22.236482-07:00"
+}

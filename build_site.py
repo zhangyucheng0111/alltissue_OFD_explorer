@@ -12,7 +12,9 @@ from datetime import datetime, timezone
 
 
 SITE_DIR = Path(__file__).resolve().parent
-DEFAULT_SOURCE = SITE_DIR.parent / "flexibility_atlas_20261022_1845" / "all_279_attempts.tsv"
+DEFAULT_SOURCE = SITE_DIR / "all_attempts.tsv"
+if not DEFAULT_SOURCE.exists():
+    DEFAULT_SOURCE = SITE_DIR.parent / "flexibility_atlas_20261022_1845" / "all_279_attempts.tsv"
 FINAL_PROTOCOLS = {
     "robustOFD_20261022_integerLock",
     "robustOFD_20261022_validation",
@@ -208,12 +210,17 @@ def build_payload(source=DEFAULT_SOURCE):
         if not required.issubset(reader.fieldnames or []):
             raise ValueError(f"TSV is missing required columns: {sorted(required - set(reader.fieldnames or []))}")
         rows = list(reader)
+    provenance_file = SITE_DIR / 'historical_provenance.json'
+    provenance = json.loads(provenance_file.read_text()) if provenance_file.exists() else {}
     runs = [normalize_run(row, source) for row in rows]
+    for row, run in zip(rows, runs):
+        if not clean_text(row.get('source')) and run['id'] in provenance:
+            run['meta']['source'] = provenance[run['id']]
     ids = [run["id"] for run in runs]
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate run IDs; attempts must not be silently combined")
-    if len(runs) != 279:
-        raise ValueError(f"Expected exactly 279 attempts, found {len(runs)}")
+    if len(runs) < 279:
+        raise ValueError(f"Expected at least the 279 historical attempts, found {len(runs)}")
     counts = {}
     for run in runs:
         counts[run["scope"]] = counts.get(run["scope"], 0) + 1
@@ -242,6 +249,9 @@ def build_payload(source=DEFAULT_SOURCE):
         "scopes": scopes,
         "runs": runs,
     }
+    status_file = SITE_DIR / 'scan_status.json'
+    if status_file.exists():
+        payload['meta']['scanSummary'] = json.loads(status_file.read_text())
     json.dumps(payload, allow_nan=False)
     return payload
 
@@ -275,6 +285,7 @@ def build_site(source=DEFAULT_SOURCE):
         "index.html": html,
     }
     inputs = [Path(source).resolve(), Path(__file__).resolve(), SITE_DIR / "README.md"]
+    inputs.extend(path for path in [SITE_DIR / 'historical_provenance.json', SITE_DIR / 'scan_status.json'] if path.exists())
     inputs.extend(SITE_DIR / name for name in FRONTEND_FILES)
     manifest = {
         "title": payload["meta"]["title"],
@@ -287,13 +298,15 @@ def build_site(source=DEFAULT_SOURCE):
     }
     output_texts["manifest.json"] = json.dumps(manifest, ensure_ascii=False, allow_nan=False, indent=2) + "\n"
     for name, content in output_texts.items():
-        (SITE_DIR / name).write_text(content, encoding="utf-8")
+        temporary = SITE_DIR / (name + '.tmp')
+        temporary.write_text(content, encoding="utf-8")
+        temporary.replace(SITE_DIR / name)
     return payload
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE, help="Replacement 279-attempt TSV with the same schema")
+    parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE, help="Historical plus supplemental attempts TSV with the same schema")
     args = parser.parse_args()
     try:
         payload = build_site(args.source)
